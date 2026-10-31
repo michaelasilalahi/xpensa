@@ -1,7 +1,8 @@
-name: Publish Backend Image to GHCR
+name: Publish Backend Image and Redeploy Arcane
 
 on:
   workflow_dispatch:
+  push:
 
 permissions:
   contents: read
@@ -51,3 +52,8 @@ jobs:
             GIT_COMMIT_HASH=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger Arcane redeployment
+        env:
+          WEBHOOK_URL: ${{ secrets.ARCANE_REDEPLOY_WEBHOOK_URL }}
+        run: curl --fail --silent --show-error --request POST "$WEBHOOK_URL"
