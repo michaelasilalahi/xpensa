@@ -1,19 +1,19 @@
-name: Publish Backend Image and Redeploy Arcane
+name: Publish Backend Image and Trigger Arcane Redeploy
 
 on:
   workflow_dispatch:
   push:
 
-permissions:
-  contents: read
-  packages: write
-
 jobs:
-  build-and-push:
+  publish:
+    name: Build and publish backend image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Normalize repository owner
@@ -53,13 +53,16 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  redeploy:
+    name: Trigger Arcane redeployment
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions: {}
+
+    steps:
       - name: Trigger Arcane redeployment
         env:
           WEBHOOK_URL: ${{ secrets.ARCANE_REDEPLOY_WEBHOOK_URL }}
-          CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
-          CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           curl --fail --silent --show-error --request POST \
-            --header "CF-Access-Client-Id: $CF_CLIENT_ID" \
-            --header "CF-Access-Client-Secret: $CF_CLIENT_SECRET" \
             "$WEBHOOK_URL"
