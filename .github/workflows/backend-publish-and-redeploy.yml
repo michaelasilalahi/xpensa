@@ -56,4 +56,10 @@ jobs:
       - name: Trigger Arcane redeployment
         env:
           WEBHOOK_URL: ${{ secrets.ARCANE_REDEPLOY_WEBHOOK_URL }}
-        run: curl --fail --silent --show-error --request POST "$WEBHOOK_URL"
+          CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          curl --fail --silent --show-error --request POST \
+            --header "CF-Access-Client-Id: $CF_CLIENT_ID" \
+            --header "CF-Access-Client-Secret: $CF_CLIENT_SECRET" \
+            "$WEBHOOK_URL"
