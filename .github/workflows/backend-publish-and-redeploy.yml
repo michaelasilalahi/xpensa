@@ -1,8 +1,13 @@
-name: Publish Backend Image and Trigger Arcane Redeploy
+name: Publish Backend Image and Trigger Dokploy Redeploy
 
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-publish-and-redeploy.yml'
 
 jobs:
   publish:
@@ -54,19 +59,39 @@ jobs:
           cache-to: type=gha,mode=max
 
   redeploy:
-    name: Trigger Arcane redeployment
+    name: Trigger Dokploy redeployment
     needs: publish
+    if: github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     permissions: {}
 
     steps:
-      - name: Trigger Arcane redeployment
+      - name: Trigger Dokploy redeployment
         env:
-          WEBHOOK_URL: ${{ secrets.ARCANE_REDEPLOY_WEBHOOK_URL }}
+          DOKPLOY_BASE_URL: ${{ secrets.DOKPLOY_BASE_URL }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          DOKPLOY_COMPOSE_ID: ${{ secrets.DOKPLOY_COMPOSE_ID }}
           CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
-          curl --fail --silent --show-error --request POST \
+          : "${DOKPLOY_BASE_URL:?DOKPLOY_BASE_URL secret is required}"
+          : "${DOKPLOY_API_KEY:?DOKPLOY_API_KEY secret is required}"
+          : "${DOKPLOY_COMPOSE_ID:?DOKPLOY_COMPOSE_ID secret is required}"
+          : "${CF_CLIENT_ID:?CF_ACCESS_CLIENT_ID secret is required}"
+          : "${CF_CLIENT_SECRET:?CF_ACCESS_CLIENT_SECRET secret is required}"
+
+          BASE_URL="${DOKPLOY_BASE_URL%/}"
+          PAYLOAD="$(jq -n \
+            --arg composeId "$DOKPLOY_COMPOSE_ID" \
+            --arg title "CI Deploy ${GITHUB_SHA:0:7}" \
+            --arg description "Triggered by GitHub Actions (${GITHUB_EVENT_NAME}) on ${GITHUB_REF_NAME} (${GITHUB_SHA})" \
+            '{composeId: $composeId, title: $title, description: $description}')"
+
+          curl --fail-with-body --silent --show-error --request POST \
+            --header "accept: application/json" \
+            --header "Content-Type: application/json" \
+            --header "x-api-key: $DOKPLOY_API_KEY" \
             --header "CF-Access-Client-Id: $CF_CLIENT_ID" \
             --header "CF-Access-Client-Secret: $CF_CLIENT_SECRET" \
-            "$WEBHOOK_URL"
+            --data "$PAYLOAD" \
+            "$BASE_URL/api/compose.deploy"

@@ -68,42 +68,15 @@ Then verify:
 
 - http://localhost:8000/docs
 
-## 6) GHCR Image via GitHub Actions
+## 6) Deployment (GHCR & Dokploy)
 
-GitHub Actions publishes the backend image to:
+Pushing changes under `backend/` to `main` (or running `workflow_dispatch`) runs `.github/workflows/backend-publish-and-redeploy.yml`:
 
-- `ghcr.io/<github-owner>/xpensa/api`
+- **Docker Image**: Publishes `ghcr.io/<github-owner>/xpensa/api` with tags `latest` (default branch) and `sha-<commit>`.
+- **Dokploy Compose**: Deploy `backend/docker-compose.yml` with required env vars `GHCR_OWNER` and `DATABASE_URL` (optional: `API_IMAGE_TAG=latest`, `API_PORT=8000`). If the GHCR package is private, add `ghcr.io` registry credentials (PAT with `read:packages`).
+- **Auto-Redeploy**: On the default branch, CI triggers `POST ${DOKPLOY_BASE_URL}/api/compose.deploy` using GitHub Actions secrets: `DOKPLOY_BASE_URL`, `DOKPLOY_API_KEY`, `DOKPLOY_COMPOSE_ID`, `CF_ACCESS_CLIENT_ID`, and `CF_ACCESS_CLIENT_SECRET`.
 
-Tags:
-
-- `latest` on `main`
-- `sha-<commit>` on each publish
-
-The workflow can run automatically on push to `main` (backend changes) or manually via `workflow_dispatch`.
-
-## 7) Deploy on Dokploy (Docker Compose)
-
-Use compose file:
-
-- `backend/docker-compose.yml`
-
-Required variables in Dokploy:
-
-- `GHCR_OWNER` (GitHub owner/org that owns the image package)
-- `DATABASE_URL` (PostgreSQL connection string)
-
-Optional variables:
-
-- `API_IMAGE_TAG` (default: `latest`)
-- `API_PORT` (default: `8000`)
-
-If GHCR package visibility is private, add GHCR registry credentials in Dokploy:
-
-- Registry: `ghcr.io`
-- Username: GitHub username or bot account
-- Password: GitHub PAT with `read:packages`
-
-## 8) Health Check
+## 7) Health Check
 
 Health endpoint:
 
