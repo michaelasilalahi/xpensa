@@ -1,5 +1,5 @@
+import numpy as np
 import pandas as pd
-from mlxtend.preprocessing import TransactionEncoder
 
 def oneHot_encoding(
     transaction_list: list, 
@@ -21,14 +21,18 @@ def oneHot_encoding(
         return pd.DataFrame()
 
     try:
-        # 1. Inisialisasi & Fitting Encoder
-        te = TransactionEncoder()
+        # 1. Ekstrak item unik terurut (ekivalen dengan mlxtend.preprocessing.TransactionEncoder)
+        unique_items = sorted({item for transaction in transaction_list for item in transaction})
+        columns_mapping = {item: col_idx for col_idx, item in enumerate(unique_items)}
 
         # 2. Transformasi data menjadi array True/False
-        te_ary = te.fit(transaction_list).transform(transaction_list)
+        te_ary = np.zeros((len(transaction_list), len(unique_items)), dtype=bool)
+        for row_idx, transaction in enumerate(transaction_list):
+            for item in transaction:
+                te_ary[row_idx, columns_mapping[item]] = True
 
         # 3. Buat dataframe
-        df_encoded = pd.DataFrame(te_ary, columns=te.columns_)
+        df_encoded = pd.DataFrame(te_ary, columns=unique_items)
 
         # 4. Kembalikan kolom tanggal
         if not df_reference.empty and date_col in df_reference.columns:

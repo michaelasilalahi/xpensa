@@ -5,16 +5,6 @@ from app.core.database import get_db
 # from analysis_custom.analysis_context
 from app.modules.data_mining.analysis_custom.analysis_context.service import analysis_context_custom
 
-# reuse from analysis_calender.association_rule_learning
-from app.modules.data_mining.analysis_calender.association_rule_learning.wishlist_filter import wishlist_filter
-from app.modules.data_mining.analysis_calender.association_rule_learning.data_preprocessing import data_preprocessing
-from app.modules.data_mining.analysis_calender.association_rule_learning.metadata_extraction import metadata_extraction
-from app.modules.data_mining.analysis_calender.association_rule_learning.transaction_aggregation import transaction_aggregation
-from app.modules.data_mining.analysis_calender.association_rule_learning.oneHot_encoding import oneHot_encoding
-from app.modules.data_mining.analysis_calender.association_rule_learning.frequent_pattern_mining import frequent_pattern_mining
-from app.modules.data_mining.analysis_calender.association_rule_learning.creating_association_rules import creating_association_rules
-from app.modules.data_mining.analysis_calender.association_rule_learning.insight_enrichment import insight_enrichment
-
 # menyimpan mining result ke database
 from app.modules.data_mining.service import save_data_mining
 from app.modules.data_mining.models import DataMiningCreate
@@ -31,6 +21,15 @@ def execute_mining_custom(
     year: int,
     db: Session = Depends(get_db)
 ):
+    # lazy import pipeline agar pandas/numpy/mlxtend tidak dimuat saat startup
+    from app.modules.data_mining.analysis_calender.association_rule_learning.wishlist_filter import wishlist_filter
+    from app.modules.data_mining.analysis_calender.association_rule_learning.data_preprocessing import data_preprocessing
+    from app.modules.data_mining.analysis_calender.association_rule_learning.metadata_extraction import metadata_extraction
+    from app.modules.data_mining.analysis_calender.association_rule_learning.transaction_aggregation import transaction_aggregation
+    from app.modules.data_mining.analysis_calender.association_rule_learning.oneHot_encoding import oneHot_encoding
+    from app.modules.data_mining.analysis_calender.association_rule_learning.frequent_pattern_mining import frequent_pattern_mining
+    from app.modules.data_mining.analysis_calender.association_rule_learning.creating_association_rules import creating_association_rules
+    from app.modules.data_mining.analysis_calender.association_rule_learning.insight_enrichment import insight_enrichment
 
     MIN_SUPPORT = 0.2 
     MIN_CONFIDENCE = 0.5
