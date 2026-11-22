@@ -2,14 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.modules.data_mining.analysis_calender.analysis_context.service import analysis_context
-from .wishlist_filter import wishlist_filter
-from .data_preprocessing import data_preprocessing
-from .metadata_extraction import metadata_extraction
-from .transaction_aggregation import transaction_aggregation
-from .oneHot_encoding import oneHot_encoding
-from .frequent_pattern_mining import frequent_pattern_mining
-from .creating_association_rules import creating_association_rules
-from .insight_enrichment import insight_enrichment
 from app.modules.data_mining.service import save_data_mining
 
 router = APIRouter(
@@ -24,7 +16,20 @@ def execute_mining(
     year: int,
     db: Session = Depends(get_db)
 ):
+<<<<<<< HEAD
     SUPPORT_LEVELS = [0.2, 0.1, 0.05]
+=======
+    from .wishlist_filter import wishlist_filter
+    from .data_preprocessing import data_preprocessing
+    from .metadata_extraction import metadata_extraction
+    from .transaction_aggregation import transaction_aggregation
+    from .oneHot_encoding import oneHot_encoding
+    from .frequent_pattern_mining import frequent_pattern_mining
+    from .creating_association_rules import creating_association_rules
+    from .insight_enrichment import insight_enrichment
+
+    MIN_SUPPORT = 0.2 
+>>>>>>> e83ac062da70084aef97b0c2c8194268ffbdb09b
     MIN_CONFIDENCE = 0.5
 
     try:
