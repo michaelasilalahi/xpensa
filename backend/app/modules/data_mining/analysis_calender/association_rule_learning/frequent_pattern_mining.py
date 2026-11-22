@@ -6,11 +6,6 @@ def frequent_pattern_mining(
     min_support: float = 0.2, 
     date_col: str = "Tanggal"
 ) -> pd.DataFrame:
-    
-    """
-        Frequent Pattern Mining (FP-Growth):
-        Mencari itemset (kombinasi barang) yang sering muncul.
-    """
 
     print("\n" + "="*50)
     print(f"   FREQUENT PATTERN MINING (FP-GROWTH)")

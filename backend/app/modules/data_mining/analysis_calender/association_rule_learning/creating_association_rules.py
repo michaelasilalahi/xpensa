@@ -25,10 +25,15 @@ def creating_association_rules(
         # mengurutkan berdasarkan lift tertinggi, lalu confidence tertinggi
         rules = rules.sort_values(by=["lift", "confidence"], ascending=[False, False]).reset_index(drop=True)
 
-        rules['pair_key'] = rules.apply(
-            lambda x: frozenset(x['antecedents']).union(frozenset(x['consequents'])), 
-            axis=1
-        )
+        # rules['pair_key'] = rules.apply(
+        #     lambda x: frozenset(x['antecedents']).union(frozenset(x['consequents'])), 
+        #     axis=1
+        # )
+
+        rules['pair_key'] = [
+            tuple(sorted(list(a) + list(c))) 
+            for a, c in zip(rules['antecedents'], rules['consequents'])
+        ]
 
         initial_count = len(rules)
         rules = rules.drop_duplicates(subset=['pair_key'], keep='first')

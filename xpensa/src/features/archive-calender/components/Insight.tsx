@@ -85,8 +85,19 @@ export const Insight = ({ month, year }: InsightProps) => {
   }
 
   return (
-    <View className='flex-1 justify-center items-center bg-white'>
-      <Text className='text-gray-500'>Tidak ada pola ditemukan.</Text>
+    <View className='flex-1 py-[50px] w-[90%] mx-auto'>
+      <View className='gap-y-[15px] py-[15px] px-[15px] items-center rounded-[15px] border-[#AAAAAA] border-[0.5px]'>
+        <View className='flex gap-y-[30px]'>
+          <Text className='font-montserrat-semibold text-center'>
+            Belum Ada Pola Terdeteksi.
+          </Text>
+          <Text className='font-montserrat-medium text-gray-500 text-center leading-7'>
+            Terus catat pengeluaran Keinginan Anda dengan disiplin. Semakin
+            banyak data yang terkumpul, semakin akurat sistem kami dalam
+            membantu Anda mencegah keborosan.
+          </Text>
+        </View>
+      </View>
     </View>
   );
 };

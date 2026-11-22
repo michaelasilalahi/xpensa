@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # databasse address
-DEFAULT_DATABASE_URL = "postgresql://postgres:michaelasilalahi@localhost:5432/xpensa_db"
+DEFAULT_DATABASE_URL = "postgresql://postgres:amanda99@localhost:5432/xpensa_db"
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 
 # engine untuk mengantar bolak-balik antara databse

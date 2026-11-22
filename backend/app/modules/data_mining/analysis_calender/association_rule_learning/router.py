@@ -24,7 +24,7 @@ def execute_mining(
     year: int,
     db: Session = Depends(get_db)
 ):
-    MIN_SUPPORT = 0.2 
+    SUPPORT_LEVELS = [0.2, 0.1, 0.05]
     MIN_CONFIDENCE = 0.5
 
     try:
@@ -51,36 +51,41 @@ def execute_mining(
 
     if not df.empty:
         df = data_preprocessing(df)
-
         metadata_df = metadata_extraction(df)
-
         algo_input_list, grouped_df = transaction_aggregation(df)
 
         if not grouped_df.empty:
             binary_matrix_df = oneHot_encoding(algo_input_list, grouped_df)
 
             if not binary_matrix_df.empty:
-                fp_growth_df = frequent_pattern_mining(
-                    binary_matrix_df, 
-                    min_support=MIN_SUPPORT
-                )
-
-                if not fp_growth_df.empty:
-                    rules_df = creating_association_rules(
-                        fp_growth_df, 
-                        min_confidence=MIN_CONFIDENCE
+                for support in SUPPORT_LEVELS:
+                    print(f"DEBUG: Mencoba mining dengan min_support: {support}")
+                    
+                    fp_growth_df = frequent_pattern_mining(
+                        binary_matrix_df, 
+                        min_support=support
                     )
 
-                    if not rules_df.empty:
-                        enriched_df = insight_enrichment(rules_df, metadata_df, df)
-                        association_rules_json = enriched_df.to_dict(orient="records")
-                        save_data_mining(
-                            db=db,
-                            setting_id=context.id,
-                            start_date=context.start_date,
-                            end_date=context.end_date,
-                            rules_data=association_rules_json
+                    if not fp_growth_df.empty:
+                        rules_df = creating_association_rules(
+                            fp_growth_df, 
+                            min_confidence=MIN_CONFIDENCE
                         )
+
+                        if not rules_df.empty:
+                            enriched_df = insight_enrichment(rules_df, metadata_df, df)
+                            association_rules_json = enriched_df.to_dict(orient="records")
+                            
+                            # Simpan hasil dan keluar dari loop
+                            save_data_mining(
+                                db=db,
+                                setting_id=context.id,
+                                start_date=context.start_date,
+                                end_date=context.end_date,
+                                rules_data=association_rules_json
+                            )
+                            print(f"DEBUG: Sukses menemukan pola pada support {support}")
+                            break # Keluar dari loop setelah ketemu pola terbaik
 
     else:
         print("DEBUG ROUTER: Data kosong, melewati preprocessing.")

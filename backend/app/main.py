@@ -76,7 +76,6 @@ app.include_router(todays_expenses_router)
 # analysis custom
 app.include_router(custom_progress_bar_router)
 
-
 app.include_router(custom_expenses_router)
 
 app.include_router(custom_mining_router)
@@ -94,6 +93,5 @@ app.include_router(result_router)
 app.include_router(visualisasi_router)
 
 app.include_router(pie_chart_router)
-
 
 app.include_router(line_chart_router)
