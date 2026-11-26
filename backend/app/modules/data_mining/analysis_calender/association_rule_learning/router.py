@@ -3,14 +3,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.modules.data_mining.analysis_calender.analysis_context.service import analysis_context
 from app.modules.data_mining.service import save_data_mining
-from .wishlist_filter import wishlist_filter
-from .data_preprocessing import data_preprocessing
-from .metadata_extraction import metadata_extraction
-from .transaction_aggregation import transaction_aggregation
-from .oneHot_encoding import oneHot_encoding
-from .frequent_pattern_mining import frequent_pattern_mining
-from .creating_association_rules import creating_association_rules
-from .insight_enrichment import insight_enrichment
 
 router = APIRouter(
     prefix="/data_mining/analysis_calender",
@@ -24,6 +16,16 @@ def execute_mining(
     year: int,
     db: Session = Depends(get_db)
 ):
+    # lazy import pipeline agar pandas/numpy/mlxtend tidak dimuat saat startup
+    from .wishlist_filter import wishlist_filter
+    from .data_preprocessing import data_preprocessing
+    from .metadata_extraction import metadata_extraction
+    from .transaction_aggregation import transaction_aggregation
+    from .oneHot_encoding import oneHot_encoding
+    from .frequent_pattern_mining import frequent_pattern_mining
+    from .creating_association_rules import creating_association_rules
+    from .insight_enrichment import insight_enrichment
+
     SUPPORT_LEVELS = [0.2, 0.1, 0.05]
     MIN_CONFIDENCE = 0.5
 

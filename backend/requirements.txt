@@ -17,4 +17,5 @@ google-auth==2.56.0
 httpx==0.28.1
 requests==2.34.2
 pandas
-mlxtend
+joblib==1.5.3
+mlxtend==0.25.0

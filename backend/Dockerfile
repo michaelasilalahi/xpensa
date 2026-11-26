@@ -18,6 +18,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     if grep -i -E '^[[:space:]]*mlxtend([=<>!~].*)?([[:space:]]*#.*)?$' requirements.txt > /tmp/requirements-mlxtend.txt; then \
         pip install --no-compile --no-deps -r /tmp/requirements-mlxtend.txt; \
     fi && \
+    python -c "from mlxtend.frequent_patterns import fpgrowth, association_rules" && \
     rm -f /tmp/requirements-base.txt /tmp/requirements-mlxtend.txt && \
     pip uninstall -y pip && \
     find /opt/venv/lib/python3.12/site-packages -type d \( -name "tests" -o -name "test" \) -prune -exec rm -rf {} + && \
